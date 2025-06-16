@@ -46,9 +46,6 @@ if __name__ == "__main__":
 - Make sure HEC-RAS is properly installed and accessible from your system’s PATH.
 - You may need to adjust the script for your particular HEC-RAS version and project setup.
 
-## License
-
-This project is provided under the [MIT License](LICENSE).
 
 ## Contributing
 
