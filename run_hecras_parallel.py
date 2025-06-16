@@ -49,12 +49,12 @@ def run_hecras(project_path, plan_name, log_path):
 
 def main():
     base_paths = [
-        r"C:\Users\Siamak.Farrokhzadeh\Pini Group\PINI-MENA - AB\T1\Model",
-        r"C:\Users\Siamak.Farrokhzadeh\Pini Group\PINI-MENA - AB\T1\Model1"
+        r"C:\Users\...\Model",
+        r"C:\Users\...\Model1"
     ]
     plans = [
-        "T1_100yrs_30CC_04",
-        "T1_100yrs_30CC_03"
+        "PLAN1",
+        "PLAN2"
     ]
     project_file = "DCP2_AB.prj"
 
