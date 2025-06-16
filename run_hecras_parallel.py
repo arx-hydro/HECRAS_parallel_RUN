@@ -56,7 +56,7 @@ def main():
         "PLAN1",
         "PLAN2"
     ]
-    project_file = "DCP2_AB.prj"
+    project_file = "PROJECT.prj"
 
     processes = []
     for i, (folder, plan) in enumerate(zip(base_paths, plans), start=1):
