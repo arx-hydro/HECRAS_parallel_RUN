@@ -45,6 +45,7 @@ if __name__ == "__main__":
 
 - Make sure HEC-RAS is properly installed and accessible from your system’s PATH.
 - You may need to adjust the script for your particular HEC-RAS version and project setup.
+- The name of your plans need to be adjusted in the script for your particular project.
 
 
 ## Contributing
