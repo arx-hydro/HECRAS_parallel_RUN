@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Created on Mon Jun 16 09:12:45 2025
+Created on Mon Jun  2 09:25:24 2025
 
 @author: Siamak.Farrokhzadeh
 """
@@ -41,8 +41,38 @@ def run_hecras_plan(project_path, plan_name):
         print(f"Error running plan '{plan_name}': {e}")
         import traceback
         traceback.print_exc()
+        
+def update_dss_path_in_u_files(temp_dir, original_dss_path):
+    if not original_dss_path:
+        return
 
-def copy_project_to_temp(original_project_path):
+    normalized_path = os.path.normpath(original_dss_path)
+
+    for file in os.listdir(temp_dir):
+        if file.lower().endswith((".u03", ".u04")):
+            u_file_path = os.path.join(temp_dir, file)
+
+            with open(u_file_path, 'r') as f:
+                lines = f.readlines()
+
+            new_lines = []
+            found = False
+            for line in lines:
+                if "DSS File=" in line:
+                    found = True
+                    new_lines.append(f"DSS File={normalized_path}\n")
+                    print(f"Updated DSS path in {file} to:\n   {normalized_path}")
+                else:
+                    new_lines.append(line)
+
+            if not found:
+                print(f"No DSS File= line found in {file}, adding one.")
+                new_lines.insert(0, f"DSS File={normalized_path}\n")
+
+            with open(u_file_path, 'w') as f:
+                f.writelines(new_lines)
+
+def copy_project_to_temp(original_project_path, original_dss_path):
     original_folder = os.path.dirname(original_project_path)
     temp_dir = tempfile.mkdtemp(prefix="HECRAS_")
     print(f"Copying project to temporary folder: {temp_dir}")
@@ -55,6 +85,10 @@ def copy_project_to_temp(original_project_path):
             shutil.copytree(s, d, dirs_exist_ok=True)
         else:
             shutil.copy2(s, d)
+            
+     # Second: only after copying all files, update the DSS path (if any)
+    if original_dss_path:
+        update_dss_path_in_u_files(temp_dir, original_dss_path)
 
     temp_project_path = os.path.join(temp_dir, os.path.basename(original_project_path))
     return temp_project_path
@@ -82,29 +116,39 @@ def run_simulations():
     # Original project path and plan names
     original_project_path = r"C:\Test\PRtest1.prj"
     main_project_dir = os.path.dirname(original_project_path)
-    plan1 = "plan01"
-    plan2 = "plan02"
-    suffix1 = "01"
-    suffix2 = "02"
+    
+    original_dss_path1 = r"C:\Users\Siamak.Farrokhzadeh\Pini Group\PINI-MENA - XXXXXX_HAFEET\07_Hydro\HECHMS\WADI SHA rev\100yCC_2024.dss"
+    suffix1 = "03"
+    suffix2 = "04"
+    
+    plans = [
+        ("plan03", None, suffix1),
+        ("plan04", original_dss_path1, suffix2),
+        # Add more here if needed
+    ]
 
-    # Copy project into two separate temp folders
-    project_path_1 = copy_project_to_temp(original_project_path)
-    project_path_2 = copy_project_to_temp(original_project_path)
+    processes = []
+    temp_paths = []
+    
+    for plan_name, dss_path, suffix in plans:
+       temp_project = copy_project_to_temp(original_project_path, dss_path)
+       temp_paths.append((temp_project, suffix))
 
-    # Create two separate processes for the plans
-    p1 = Process(target=run_hecras_plan, args=(project_path_1, plan1))
-    p2 = Process(target=run_hecras_plan, args=(project_path_2, plan2))
+       p = Process(target=run_hecras_plan, args=(temp_project, plan_name))
+       p.start()
+       processes.append(p)
 
-    # Start and wait for both
-    p1.start()
-    p2.start()
-    p1.join()
-    p2.join()
+     # Wait for all to complete
+    for p in processes:
+        p.join()
 
-    print("Both simulations completed.")
-    # Copy results back to main project folder
-    copy_results_to_main_project(project_path_1, main_project_dir, suffix1)
-    copy_results_to_main_project(project_path_2, main_project_dir, suffix2)
+    print("All simulations completed.")
+
+    # Copy all results back
+    for temp_project, suffix in temp_paths:
+        copy_results_to_main_project(temp_project, main_project_dir, suffix)
+
+    print("All results copied. Open RAS Mapper and refresh.")
 
 if __name__ == "__main__":
     run_simulations()
