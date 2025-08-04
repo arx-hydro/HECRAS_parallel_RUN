@@ -23,7 +23,7 @@ This repository contains Python code to run HEC-RAS hydraulic modeling software 
    ```
 
 2. **Edit `run_hecras_parallel.py`:**  
-   Set up your list of HEC-RAS projects or plans to run in the script.
+   Set up your list of HEC-RAS plans to run in the script.
 
 3. **Run the script:**
    ```bash
@@ -42,10 +42,11 @@ if __name__ == "__main__":
 ```
 
 ## Notes
-
 - Make sure HEC-RAS is properly installed and accessible from your system’s PATH.
 - You may need to adjust the script for your particular HEC-RAS version and project setup.
 - The name of your plans need to be adjusted in the script for your particular project.
+- The code is prepared for an small basin wheerein two BC have been set. One BC read unsteady flow from dss file and the other one is adjusted manually.
+- All the directories must be updated according to your particular project.
 
 
 ## Contributing
